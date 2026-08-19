@@ -1,5 +1,10 @@
 == Changelog ==
 
+= 3.6.1 =
+* Release Date 19 August 2026*
+
+* Fix: 3.6.0 was tagged without its built app/dist/ assets (packaging mistake), which caused a blank admin/builder screen and the admin UI falling back to plain WordPress. No code changes beyond including the missing build output.
+
 = 3.6.0 =
 * Release Date 18 August 2026*
 
