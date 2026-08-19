@@ -1,6 +1,7 @@
 <script>
 const { __ } = wp.i18n;
 export default {
+  inject: ["uiTemplate"],
   props: {
     display: String,
     name: String,
@@ -394,7 +395,12 @@ export default {
       formData.append("action", "uip_process_form_input");
       formData.append("security", uip_ajax.security);
       formData.append("formData", formatted);
+      // userFunction is sent for reference/logging only - the server looks up
+      // the actual function to call from this block's own saved settings, so
+      // this value can't be used to invoke an arbitrary function.
       formData.append("userFunction", userFunction);
+      formData.append("templateID", this.uiTemplate?.id ?? "");
+      formData.append("blockUID", this.block.uid ?? "");
 
       const response = await this.sendServerRequest(uip_ajax.ajax_url, formData);
       this.loading = false;

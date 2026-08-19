@@ -484,6 +484,10 @@ class uip_site_settings
       if ($settings && is_object($settings)) {
         Objects::ensureNested($settings, ["options", "advanced"]);
         $css = isset($settings->options->advanced->css) ? html_entity_decode($settings->options->advanced->css) : "";
+        // Strip any literal style tag boundaries so stored CSS can't break out of (or nest
+        // fake tags inside) the <style> block this is rendered into below - this runs
+        // pre-authentication, on wp-login.php.
+        $css = str_ireplace(["<style", "</style"], "", $css);
       }
     }
 
@@ -504,7 +508,7 @@ class uip_site_settings
           }
         } ?>
     }
-    <?php echo htmlspecialchars_decode(esc_html($css)); ?>
+    <?php echo $css; ?>
     </style>
     <?php
     $safe_css = ob_get_clean();

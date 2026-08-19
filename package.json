@@ -1,0 +1,13 @@
+{
+  "name": "uipress-lite-tools",
+  "private": true,
+  "description": "Dev tooling for packaging uipress-lite as a distributable zip. Not part of the plugin itself.",
+  "scripts": {
+    "package": "node package-plugin.js"
+  },
+  "devDependencies": {
+    "archiver": "^7.0.1",
+    "fs-extra": "^11.2.0",
+    "glob": "^11.0.0"
+  }
+}

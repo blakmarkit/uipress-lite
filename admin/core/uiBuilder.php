@@ -230,6 +230,11 @@ class uip_ui_builder extends uip_app
     // Check security nonce and 'DOING_AJAX' global
     Ajax::check_referer();
 
+    // Check user has permission to manage ui
+    if (!current_user_can("uip_manage_ui")) {
+      Ajax::error(__("You do not have permission to perform this action", "uipress-lite"));
+    }
+
     $options = json_decode(stripslashes($_POST["settings"]));
     $options = Sanitize::clean_input_with_code($options);
 
@@ -335,6 +340,11 @@ class uip_ui_builder extends uip_app
     // Check security nonce and 'DOING_AJAX' global
     Ajax::check_referer();
 
+    // Check user has permission to manage ui
+    if (!current_user_can("uip_manage_ui")) {
+      Ajax::error(__("You do not have permission to perform this action", "uipress-lite"));
+    }
+
     $decoded = json_decode(stripslashes($_POST["settings"]));
     $options = Sanitize::clean_input_with_code($decoded);
 
@@ -381,6 +391,11 @@ class uip_ui_builder extends uip_app
   {
     // Check security nonce and 'DOING_AJAX' global
     Ajax::check_referer();
+
+    // Check user has permission to manage ui
+    if (!current_user_can("uip_manage_ui")) {
+      Ajax::error(__("You do not have permission to perform this action", "uipress-lite"));
+    }
 
     // The type of ui-template to create
     $type = sanitize_text_field($_POST["templateType"]);
@@ -539,6 +554,11 @@ class uip_ui_builder extends uip_app
     // Check security nonce and 'DOING_AJAX' global
     Ajax::check_referer();
 
+    // Check user has permission to manage ui
+    if (!current_user_can("uip_manage_ui")) {
+      Ajax::error(__("You do not have permission to perform this action", "uipress-lite"));
+    }
+
     $templateID = sanitize_text_field($_POST["templateid"]);
     $status = sanitize_text_field($_POST["status"]);
 
@@ -575,6 +595,11 @@ class uip_ui_builder extends uip_app
   {
     // Check security nonce and 'DOING_AJAX' global
     Ajax::check_referer();
+
+    // Check user has permission to manage ui
+    if (!current_user_can("uip_manage_ui")) {
+      Ajax::error(__("You do not have permission to perform this action", "uipress-lite"));
+    }
 
     // Update Cache key to invalidate local storage cached templates
     $cache_key = bin2hex(random_bytes(6));
@@ -615,6 +640,11 @@ class uip_ui_builder extends uip_app
     // Check security nonce and 'DOING_AJAX' global
     Ajax::check_referer();
 
+    // Check user has permission to manage ui
+    if (!current_user_can("uip_manage_ui")) {
+      Ajax::error(__("You do not have permission to perform this action", "uipress-lite"));
+    }
+
     // Sanitise inputs
     $template = json_decode(stripslashes($_POST["template"]));
     $template = Sanitize::clean_input_with_code($template);
@@ -646,6 +676,11 @@ class uip_ui_builder extends uip_app
     // Check security nonce and 'DOING_AJAX' global
     Ajax::check_referer();
 
+    // Check user has permission to manage ui
+    if (!current_user_can("uip_manage_ui")) {
+      Ajax::error(__("You do not have permission to perform this action", "uipress-lite"));
+    }
+
     $styles = json_decode(stripslashes($_POST["styles"]));
     $styles = Sanitize::clean_input_with_code($styles);
 
@@ -669,6 +704,11 @@ class uip_ui_builder extends uip_app
   {
     // Check security nonce and 'DOING_AJAX' global
     Ajax::check_referer();
+
+    // Check user has permission to manage ui
+    if (!current_user_can("uip_manage_ui")) {
+      Ajax::error(__("You do not have permission to perform this action", "uipress-lite"));
+    }
 
     $pattern = json_decode(stripslashes($_POST["pattern"]));
     $pattern = Sanitize::clean_input_with_code($pattern);
@@ -736,6 +776,11 @@ class uip_ui_builder extends uip_app
   {
     // Check security nonce and 'DOING_AJAX' global
     Ajax::check_referer();
+
+    // Check user has permission to manage ui
+    if (!current_user_can("uip_manage_ui")) {
+      Ajax::error(__("You do not have permission to perform this action", "uipress-lite"));
+    }
 
     $pattern = json_decode(stripslashes($_POST["pattern"]));
     $pattern = Sanitize::clean_input_with_code($pattern);

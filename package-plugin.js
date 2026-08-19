@@ -66,8 +66,8 @@ function cleanupFiles(dir, filesToRemove, dirsToClean, scriptName) {
   // Remove .DS_Store files
   removeDSStoreFiles(dir);
 
-  // Remove .git and .nova directories
-  removeDirectories(dir, [".git", ".nova"]);
+  // Remove .git, .nova, and .vscode directories
+  removeDirectories(dir, [".git", ".nova", ".vscode"]);
 }
 
 // Function to create zip file
@@ -100,8 +100,8 @@ async function packagePlugin(pluginDir, pluginFile, scriptName) {
     const version = getPluginVersion(path.join(pluginDir, pluginFile));
     const pluginName = path.basename(pluginDir);
 
-    // Define staging directory
-    const stagingDir = path.resolve(pluginDir, "..", "..", "..", "..", "staging");
+    // Define staging directory (sibling of the plugin directory)
+    const stagingDir = path.resolve(pluginDir, "..", "staging");
     const uncompressedDir = path.join(stagingDir, pluginName);
 
     // Remove existing uncompressed directory if it exists
@@ -111,11 +111,19 @@ async function packagePlugin(pluginDir, pluginFile, scriptName) {
 
     // Create uncompressed version in staging directory
     console.log("Creating uncompressed version...");
-    fs.copySync(pluginDir, uncompressedDir);
+    fs.copySync(pluginDir, uncompressedDir, {
+      // Skip node_modules/.git upfront - they're large and never belong in the
+      // distributable zip, and skipping them here avoids a slow full copy.
+      filter: (src) => {
+        const rel = path.relative(pluginDir, src);
+        const parts = rel.split(path.sep);
+        return !parts.includes("node_modules") && !parts.includes(".git");
+      },
+    });
 
     // Clean up files in the uncompressed version
     console.log("Cleaning up files...");
-    cleanupFiles(uncompressedDir, [".gitignore"], [{ dir: "app", except: ["dist"] }], scriptName);
+    cleanupFiles(uncompressedDir, [".gitignore", ".cursorrules", "composer.json", "package.json", "package-lock.json"], [{ dir: "app", except: ["dist"] }], scriptName);
 
     // Create zip file
     const zipFileName = `${pluginName}-${version}.zip`;
@@ -132,7 +140,7 @@ async function packagePlugin(pluginDir, pluginFile, scriptName) {
 }
 
 // Usage
-const pluginDirectory = "../uipress-lite"; // Replace with your plugin directory
+const pluginDirectory = __dirname; // This script lives at the plugin root
 const mainPluginFile = "uipress-lite.php"; // Replace with your main plugin file name
 const packagingScriptName = "package-plugin.js"; // The name of this script file
 
