@@ -4,7 +4,7 @@ Tags: admin theme, custom dashboard, google analytics, woocommerce analytics, wh
 Requires at least: 6.0
 Requires PHP: 7.4
 Tested up to: 7.0
-Stable tag: 3.6.1
+Stable tag: 3.6.2
 License: GPLv2 or later
 
 Effortless custom WordPress admin dashboards.
@@ -54,6 +54,13 @@ Upload the UiPress plugin to your blog, activate it, and then navigate to the ui
 1, 2, 3: You're done!
 
 == Changelog ==
+
+= 3.6.2 =
+* Release Date 21 September 2026*
+
+* Security: Fixed a privilege escalation allowing any authenticated user to update their own restricted user meta (including wp_capabilities) via uip_save_form_as_user_option(), which could be used to self-promote to Administrator. Added the same protection to the form pre-populate read path.
+* Security: Added permission checks to the remaining read-only uiBuilder AJAX actions (template/pattern/style/settings listing and lookup) — these are builder-only endpoints, not used when viewing an already-built dashboard, so this closes the same "AJAX bypasses page-level access control" gap as the write-side fixes in 3.6.0 without affecting normal dashboard viewing for any role.
+* Security: Added SSRF protection (blocks private/loopback/internal hosts) to the remote import/sync feature.
 
 = 3.6.1 =
 * Release Date 19 August 2026*

@@ -372,6 +372,11 @@ class uip_ui_builder extends uip_app
     // Check security nonce and 'DOING_AJAX' global
     Ajax::check_referer();
 
+    // Check user has permission to manage ui
+    if (!current_user_can("uip_manage_ui")) {
+      Ajax::error(__("You do not have permission to perform this action", "uipress-lite"));
+    }
+
     // Get site settings
     $options = UipOptions::get("site-settings");
     $options = $options ? $options : new stdClass();
@@ -428,6 +433,11 @@ class uip_ui_builder extends uip_app
     // Check security nonce and 'DOING_AJAX' global
     Ajax::check_referer();
 
+    // Check user has permission to manage ui
+    if (!current_user_can("uip_manage_ui")) {
+      Ajax::error(__("You do not have permission to perform this action", "uipress-lite"));
+    }
+
     $search = sanitize_text_field($_POST["search"]);
 
     $options = ["perPage" => -1, "search" => $search];
@@ -456,6 +466,11 @@ class uip_ui_builder extends uip_app
   {
     // Check security nonce and 'DOING_AJAX' global
     Ajax::check_referer();
+
+    // Check user has permission to manage ui
+    if (!current_user_can("uip_manage_ui")) {
+      Ajax::error(__("You do not have permission to perform this action", "uipress-lite"));
+    }
 
     $templateID = sanitize_text_field($_POST["templateID"]);
 
@@ -500,6 +515,11 @@ class uip_ui_builder extends uip_app
   {
     // Check security nonce and 'DOING_AJAX' global
     Ajax::check_referer();
+
+    // Check user has permission to manage ui
+    if (!current_user_can("uip_manage_ui")) {
+      Ajax::error(__("You do not have permission to perform this action", "uipress-lite"));
+    }
 
     $styles = UipOptions::get("theme-styles");
     $styles = is_object($styles) ? $styles : new stdClass();
@@ -823,6 +843,11 @@ class uip_ui_builder extends uip_app
     // Check security nonce and 'DOING_AJAX' global
     Ajax::check_referer();
 
+    // Check user has permission to manage ui
+    if (!current_user_can("uip_manage_ui")) {
+      Ajax::error(__("You do not have permission to perform this action", "uipress-lite"));
+    }
+
     // Sanitise search
     $string = sanitize_text_field($_POST["searchStr"]);
 
@@ -856,6 +881,11 @@ class uip_ui_builder extends uip_app
   {
     // Check security nonce and 'DOING_AJAX' global
     Ajax::check_referer();
+
+    // Check user has permission to manage ui
+    if (!current_user_can("uip_manage_ui")) {
+      Ajax::error(__("You do not have permission to perform this action", "uipress-lite"));
+    }
 
     // Get patterns list
     $options = ["perPage" => -1, "search" => ""];

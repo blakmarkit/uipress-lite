@@ -580,12 +580,19 @@ class uip_ajax
 
     // save as object
     if ($objectOrSingle == "object") {
+      if (Users::is_protected_meta_key($userMetaObjectKey)) {
+        Ajax::error(__("This meta key cannot be updated", "uipress-lite"));
+      }
       update_user_meta($userID, $userMetaObjectKey, $data);
     }
 
     // Save as keys
     if ($objectOrSingle == "single") {
       foreach ($data as $key => $value) {
+        $key = sanitize_key($key);
+        if (!$key || Users::is_protected_meta_key($key)) {
+          Ajax::error(__("This meta key cannot be updated", "uipress-lite"));
+        }
         update_user_meta($userID, $key, $value);
       }
     }
@@ -705,12 +712,19 @@ class uip_ajax
 
       if ($objectOrSingle == "single") {
         foreach ($formKeys as $key) {
+          $key = sanitize_key($key);
+          if (!$key || Users::is_protected_meta_key($key)) {
+            continue;
+          }
           $value = get_user_meta($userID, $key, true);
           $data[$key] = $value;
         }
       }
 
       if ($objectOrSingle == "object") {
+        if (Users::is_protected_meta_key($userMetaObjectKey)) {
+          wp_send_json([]);
+        }
         $userdata = get_user_meta($userID, $userMetaObjectKey, true);
 
         if (is_array($userdata)) {

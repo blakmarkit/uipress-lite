@@ -1,5 +1,12 @@
 == Changelog ==
 
+= 3.6.2 =
+* Release Date 21 September 2026*
+
+* Security: Blocked privileged user-meta writes from form submissions.
+* Security: Added permission checks to the remaining read-only uiBuilder AJAX actions (template/pattern/style/settings listing and lookup) — these are builder-only endpoints, not used when viewing an already-built dashboard, so this closes the same "AJAX bypasses page-level access control" gap as the write-side fixes in 3.6.0 without affecting normal dashboard viewing for any role.
+* Security: Added SSRF protection (blocks private/loopback/internal hosts) to the remote import/sync feature.
+
 = 3.6.1 =
 * Release Date 19 August 2026*
 

@@ -2,6 +2,7 @@
 namespace UipressLite\Classes\ImportExport;
 use UipressLite\Classes\PostTypes\UiTemplates;
 use UipressLite\Classes\App\UipOptions;
+use UipressLite\Classes\Utils\URL;
 
 !defined("ABSPATH") ? exit() : "";
 
@@ -44,6 +45,12 @@ class Import
     if (!$path || !$key || !is_object($types)) {
       $returndata["error"] = true;
       $returndata["message"] = __("Missing data required for import", "uipress-lite");
+      return $returndata;
+    }
+
+    if (!URL::is_safe_remote_url($path)) {
+      $returndata["error"] = true;
+      $returndata["message"] = __("Remote URL is not allowed", "uipress-lite");
       return $returndata;
     }
 
