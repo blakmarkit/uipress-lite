@@ -415,6 +415,11 @@ class UiTemplates
    */
   public static function save($templateID, $template)
   {
+    // Check permissions
+    if (!current_user_can("uip_manage_ui")) {
+      return false;
+    }
+
     // Update Cache key to invalidate local storage cached templates
     $cache_key = bin2hex(random_bytes(6));
     update_option("uipress-cache-key", $cache_key);

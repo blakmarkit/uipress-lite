@@ -4,7 +4,7 @@ Tags: admin theme, custom dashboard, google analytics, woocommerce analytics, wh
 Requires at least: 6.0
 Requires PHP: 7.4
 Tested up to: 7.0
-Stable tag: 3.5.10
+Stable tag: 3.6.2
 License: GPLv2 or later
 
 Effortless custom WordPress admin dashboards.
@@ -54,6 +54,28 @@ Upload the UiPress plugin to your blog, activate it, and then navigate to the ui
 1, 2, 3: You're done!
 
 == Changelog ==
+
+= 3.6.2 =
+* Release Date 21 September 2026*
+
+* Security: Fixed a privilege escalation allowing any authenticated user to update their own restricted user meta (including wp_capabilities) via uip_save_form_as_user_option(), which could be used to self-promote to Administrator. Added the same protection to the form pre-populate read path.
+* Security: Added permission checks to the remaining read-only uiBuilder AJAX actions (template/pattern/style/settings listing and lookup) — these are builder-only endpoints, not used when viewing an already-built dashboard, so this closes the same "AJAX bypasses page-level access control" gap as the write-side fixes in 3.6.0 without affecting normal dashboard viewing for any role.
+* Security: Added SSRF protection (blocks private/loopback/internal hosts) to the remote import/sync feature.
+
+= 3.6.1 =
+* Release Date 19 August 2026*
+
+* Fix: 3.6.0 was tagged without its built app/dist/ assets (packaging mistake), which caused a blank admin/builder screen and the admin UI falling back to plain WordPress. No code changes beyond including the missing build output.
+
+= 3.6.0 =
+* Release Date 18 August 2026*
+
+* Security: Added missing permission checks to template, pattern, and site-settings save/create/sync/duplicate actions (requires the uip_manage_ui capability, previously only nonce-checked)
+* Security: Fixed unauthenticated CSS injection on the login page via crafted template CSS
+* Security: Form blocks with a "call a PHP function" submit action now resolve the function from the form's own saved settings instead of trusting the submitted request
+* Security: Added list_users capability check to the user/role lookup endpoint, and restricted the posts-table endpoint to published content for users who can't otherwise see drafts/private posts
+* Security: Hardened the remote-sync export endpoint's key comparison against timing attacks
+* Note: if you have non-Administrator roles that use the uiBuilder to create/edit/save templates, patterns, or site settings, grant them the uip_manage_ui capability to keep that working
 
 = 3.5.10 =
 * Release Date 10 August 2026*

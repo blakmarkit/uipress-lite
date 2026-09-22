@@ -109,7 +109,7 @@ class Export
       return new \WP_REST_Response($returndata, 200);
     }
 
-    if ($siteOptions["key"] != $key) {
+    if (!hash_equals((string) $siteOptions["key"], (string) $key)) {
       $returndata = [];
       $returndata["error"] = true;
       $returndata["message"] = __("Incorrect key", "uipress-lite");

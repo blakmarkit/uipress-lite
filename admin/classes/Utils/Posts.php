@@ -79,6 +79,11 @@ class Posts
    */
   public static function duplicate($postID)
   {
+    // Check permissions
+    if (!current_user_can("uip_manage_ui")) {
+      return false;
+    }
+
     // Sanitize and validate input
     $postID = absint($postID);
     if (!$postID || !get_post_status($postID)) {

@@ -10,6 +10,7 @@ use UipressLite\Classes\App\UserPreferences;
 use UipressLite\Classes\Utils\Users;
 use UipressLite\Classes\Utils\Objects;
 use UipressLite\Classes\Scripts\AdminMenu;
+use UipressLite\Classes\PostTypes\UiTemplates;
 
 !defined("ABSPATH") ? exit() : "";
 
@@ -579,12 +580,19 @@ class uip_ajax
 
     // save as object
     if ($objectOrSingle == "object") {
+      if (Users::is_protected_meta_key($userMetaObjectKey)) {
+        Ajax::error(__("This meta key cannot be updated", "uipress-lite"));
+      }
       update_user_meta($userID, $userMetaObjectKey, $data);
     }
 
     // Save as keys
     if ($objectOrSingle == "single") {
       foreach ($data as $key => $value) {
+        $key = sanitize_key($key);
+        if (!$key || Users::is_protected_meta_key($key)) {
+          Ajax::error(__("This meta key cannot be updated", "uipress-lite"));
+        }
         update_user_meta($userID, $key, $value);
       }
     }
@@ -704,12 +712,19 @@ class uip_ajax
 
       if ($objectOrSingle == "single") {
         foreach ($formKeys as $key) {
+          $key = sanitize_key($key);
+          if (!$key || Users::is_protected_meta_key($key)) {
+            continue;
+          }
           $value = get_user_meta($userID, $key, true);
           $data[$key] = $value;
         }
       }
 
       if ($objectOrSingle == "object") {
+        if (Users::is_protected_meta_key($userMetaObjectKey)) {
+          wp_send_json([]);
+        }
         $userdata = get_user_meta($userID, $userMetaObjectKey, true);
 
         if (is_array($userdata)) {
@@ -777,9 +792,26 @@ class uip_ajax
     $data = json_decode(stripslashes($_POST["formData"]));
     $data = Sanitize::clean_input_with_code($data);
 
-    $userFunction = sanitize_text_field($_POST["userFunction"]);
+    $templateID = absint($_POST["templateID"]);
+    $blockUID = sanitize_text_field($_POST["blockUID"]);
 
-    if (!function_exists($userFunction)) {
+    // Resolve which function to call from the form block's own saved settings -
+    // the client-submitted "userFunction" value is never trusted directly, since
+    // that would let anyone reaching this action invoke any existing PHP function.
+    $userFunction = self::get_configured_form_function($templateID, $blockUID);
+
+    /**
+     * Filters the function uiPress is about to call for a form's PHP submit action.
+     * Return false to block the call even though it's configured on the block.
+     *
+     * @since 3.6.0
+     * @param string|false $userFunction The function name resolved from the block's saved settings.
+     * @param int $templateID
+     * @param string $blockUID
+     */
+    $userFunction = apply_filters("uip_allowed_form_functions", $userFunction, $templateID, $blockUID);
+
+    if (!$userFunction || !function_exists($userFunction)) {
       Ajax::error(__('Passed function doesn\'t exist', "uipress-lite"));
     }
 
@@ -794,6 +826,69 @@ class uip_ajax
     $returndata = [];
     $returndata["success"] = true;
     wp_send_json($returndata);
+  }
+
+  /**
+   * Finds the PHP function name configured for a form block's submit action,
+   * reading only from the template's own saved settings (never client input).
+   *
+   * @param int $templateID
+   * @param string $blockUID
+   * @return string|false
+   * @since 3.6.0
+   */
+  private static function get_configured_form_function($templateID, $blockUID)
+  {
+    if (!$templateID || !$blockUID) {
+      return false;
+    }
+
+    $content = UiTemplates::get_content($templateID);
+    $block = self::find_block_by_uid($content, $blockUID);
+
+    if (!$block) {
+      return false;
+    }
+
+    $submitAction = Objects::get_nested_property($block, ["settings", "block", "options", "submitAction", "value"]);
+
+    if (!is_object($submitAction) || !isset($submitAction->action) || $submitAction->action !== "phpFunction") {
+      return false;
+    }
+
+    return !empty($submitAction->phpFunction) ? sanitize_text_field($submitAction->phpFunction) : false;
+  }
+
+  /**
+   * Recursively searches a template's block tree for a block matching the given uid.
+   *
+   * @param array $blocks
+   * @param string $uid
+   * @return object|false
+   * @since 3.6.0
+   */
+  private static function find_block_by_uid($blocks, $uid)
+  {
+    if (!is_array($blocks)) {
+      return false;
+    }
+
+    foreach ($blocks as $block) {
+      if (!is_object($block)) {
+        continue;
+      }
+      if (isset($block->uid) && $block->uid === $uid) {
+        return $block;
+      }
+      if (isset($block->content) && is_array($block->content)) {
+        $found = self::find_block_by_uid($block->content, $uid);
+        if ($found) {
+          return $found;
+        }
+      }
+    }
+
+    return false;
   }
 
   /**
@@ -1031,7 +1126,7 @@ class uip_ajax
       "post_type" => $types,
       "posts_per_page" => $perPage,
       "paged" => $page,
-      "post_status" => "any",
+      "post_status" => current_user_can("edit_others_posts") ? "any" : "publish",
       "s" => $string,
     ];
 
@@ -1292,6 +1387,11 @@ class uip_ajax
   {
     // Check security nonce and 'DOING_AJAX' global
     Ajax::check_referer();
+
+    // Check user has permission to list users
+    if (!current_user_can("list_users")) {
+      Ajax::error(__("You do not have permission to perform this action", "uipress-lite"));
+    }
 
     $term = sanitize_text_field($_POST["searchString"]);
     $page = isset($_POST["page"]) ? sanitize_text_field($_POST["page"]) : 1;

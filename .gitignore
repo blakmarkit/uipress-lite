@@ -3,3 +3,6 @@
 
 # Ignore directory prefs
 .DS_STORE
+
+# Dev tooling deps (package-plugin.js) - not part of the plugin itself
+node_modules
